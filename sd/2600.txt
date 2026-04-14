@@ -178,8 +178,11 @@ Buck Rogers - Planet of Zoom
 Bugs
 064
 
-Bump 'n' Jump
+Bump 'n' Jump (Mattel)
 231
+
+Bump 'n' Jump (Telegames)
+248
 
 Bumper Bash
 064
@@ -1153,6 +1156,9 @@ Ski Run
 Skiing
 032
 
+Sky Alien
+064
+
 Sky Diver
 032
 
@@ -1247,7 +1253,7 @@ Springer
 063
 
 Sprint Master
-246
+006
 
 Spy Hunter
 248

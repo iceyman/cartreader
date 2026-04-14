@@ -49,7 +49,7 @@
  * String Constants
  **/
 // Firmware Version
-constexpr char PROGMEM FSTRING_VERSION[] = "V15.3";
+constexpr char PROGMEM FSTRING_VERSION[] = "V15.6";
 
 // Universal
 constexpr char PROGMEM FSTRING_RESET[] = "Reset";
@@ -262,7 +262,11 @@ VOLTS setVoltage(VOLTS newVoltage) {
 
       // Adjust voltage high if VSELECT is available
   #if defined(ENABLE_VSELECT)
+    #ifdef ENABLE_ROTARY
       PORTD &= ~(1 << 7); /*[1]*/
+    #else
+      PORTD &= ~(1 << 3); /*[1]*/
+    #endif
       voltage = VOLTS_SET_5V;
   #endif
 
@@ -315,7 +319,11 @@ VOLTS setVoltage(VOLTS newVoltage) {
 
       // Adjust voltage high if VSELECT is available
   #if defined(ENABLE_VSELECT)
+    #ifdef ENABLE_ROTARY
       PORTD |= (1 << 7); /*[1]*/
+    #else
+      PORTD |= (1 << 3); /*[1]*/
+    #endif
       voltage = VOLTS_SET_3V3;
   #endif
 

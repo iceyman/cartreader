@@ -77,6 +77,17 @@ body:
         - Flashrom Programmer
     validations:
       required: true
+  - type: dropdown
+    id: cleaned
+    attributes:
+      label: Cartridge pins freshly cleaned?
+      description: Clean gold fingers with IPA and cotton swap until no more black comes off.
+      options:
+        - Select answer
+        - "No"
+        - "Yes"
+    validations:
+      required: true
   - type: textarea
     id: bug-desc
     attributes:

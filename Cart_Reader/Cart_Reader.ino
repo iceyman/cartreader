@@ -419,10 +419,10 @@ uint32_t calculateCRC(const byte* buffer, size_t length) {
 }
 
 uint32_t calculateCRC(FsFile& infile) {
-  uint32_t byte_count;
+  int32_t byte_count;
   uint32_t crc = 0xFFFFFFFF;
 
-  while ((byte_count = infile.read(sdBuffer, sizeof(sdBuffer))) != 0) {
+  while ((byte_count = infile.read(sdBuffer, sizeof(sdBuffer))) > 0) {
     crc = updateCRC(sdBuffer, byte_count, crc);
   }
   return ~crc;
@@ -1297,6 +1297,11 @@ void mainMenu() {
       display_Clear();
       display_Update();
       setup_NES();
+      // Wait for MMC3
+      for (size_t c = 0; c < 512; c++) {
+        read_prg_byte(0x8000 + c);
+        read_prg_byte(0xE000 + c);
+      }
       getMapping();
       checkStatus_NES();
       return nesMenu();
@@ -2144,26 +2149,33 @@ int32_t initializeClockOffset() {
 void setup() {
   // Set Button Pin PG2 to Input
   DDRG &= ~(1 << 2);
-#if defined(HW5) && !defined(ENABLE_VSELECT)
+  // Set pin PD7 to Input by default (e.g. HW1-3 have button connected to PD7)
+  DDRD &= ~(1 << 7);
+
+#ifdef ENABLE_VSELECT
+  #ifdef ENABLE_ROTARY // e.g. HW5, HW4
   /**
-     HW5 has status LED connected to PD7
-     Set LED Pin PD7 to Output
+   * VSELECT uses pin PD7 when ROTARY is enabled (PD3 is used)
+   * Set LED Pin PD7 to Output
+   **/
+  DDRD |= (1 << 7);
+  #else /* !defined(ENABLE_ROTARY) */
+  /**
+   * VSELECT uses pin PD3 when ROTARY is NOT enabled (PD3 is NOT used)
+   * Set ROTARY Pin PD3 to Output
+   **/
+  DDRD |= (1 << 3);
+  #endif /* ENABLE_ROTARY */
+#else  /* !defined(ENABLE_VSELECT) */
+  #ifdef HW5
+  /**
+   * HW5 has status LED connected to PD7
+   * Set LED Pin PD7 to Output
    **/
   DDRD |= (1 << 7);
   PORTD |= (1 << 7);
-#elif defined(ENABLE_VSELECT)
-  /**
-     VSELECT uses pin PD7
-     Set LED Pin PD7 to Output
-   **/
-  DDRD |= (1 << 7);
-#else  /* !defined(HW5) && !defined(ENABLE_VSELECT) */
-  /**
-     HW1-3 have button connected to PD7
-     Set pin PD7 to input for button
-   **/
-  DDRD &= ~(1 << 7);
-#endif /* HW5 &| ENABLE_VSELECT */
+  #endif /* HW5 */
+#endif /* ENABLE_VSELECT */
 
   // Set power to low to protect carts
   setVoltage(VOLTS_SET_3V3);
@@ -3774,4 +3786,3 @@ void loop() {
 //******************************************
 // End of File
 //******************************************
-
